@@ -1,0 +1,5 @@
+This assignment is about the Situation Calculus and Planning. It consists of three parts. Part 1 is a written exercise that requires you to formalise a planning problem, using Situation Calculus. to represent the world. Part 2 is about implementing the model and verifying its correctness
+using a planner based on the Golog syntax. And part 3 is about extending the model as well as its implementation in order to deal with additional aspects of the environment.
+
+The files that you need are available from:
+http://www.inf.ed.ac.uk/teaching/courses/inf2d/coursework/Inf2D-Coursework2.zip
