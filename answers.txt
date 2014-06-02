@@ -1,0 +1,162 @@
+-----------------------------------------------------------------------
+ ------ Informatics 2D - 2012/13 - Second Assignment - Planning ------
+-----------------------------------------------------------------------
+ 
+ Write here you matriculation number (only - your name is not needed)
+ Matriculation Number: s1245523
+ 
+1.1)
+
+-Robot(o): 'o' is a robot. (either a wheelchair or a nurseBot).
+-Adjacent(x,y): Square 'x' and 'y' are adjacent to each other.
+-At(o,x,s): 'o' is at square 'x' at situation 's'
+-CarryPlate(s): NurseBot carries the plate at situation 's'
+-hungry(s): Patient is hungry at situation 's'
+-Clear(x,s): Square 'x' is clear at situation 's' (NB and W are not there).
+-InBed(s): Patient is in bed at situation 's'.
+
+adjacent(a1, a2).
+adjacent(a2, a1).
+adjacent(a2, a3).
+adjacent(a3, a2).
+adjacent(a2, a4).
+adjacent(a4, a2).
+adjacent(a4, a5).
+adjacent(a5, a4).
+adjacent(a5, a6).
+adjacent(a5, a5).
+
+
+-since adjacent(X,Y) is not the samething as adjacent(Y,X) (from the prologs view), we have to write every adjacency twice.
+
+1.2) 
+
+Using the predicate "At(o,x,s)" we always can find out what is the position of NurseRobot and WheelchaiRobot, at any situation.
+Also using "CarryPlate(s)", we can find out in what situation robot carries the food. for example if "not-CarryPlate(s)" and "CarryPlate(reasult(a,s))", it measn NurseRobot grabed the food at situation s. Also I made the reasonable assuption that plate will be always at a1 since it is not gonna move itself and except nursebot, nobody is gonna move it.
+
+1.3)
+
+a) Using "hungry(s)", we can find out if the patient is hungry or has been fed already. (not(hungry(s))).
+
+b) If we want to check that the plate has been disposed or not (which means nobody carries the plate), we can use "not-CarryPlate(s)" after feeding the patient. If the patient is fed, that means nursebot had the plate, and if nursebot won't have the plate at some situation after that, it means nursebot disposed the plate.
+
+1.4)
+
+At(W,a1,s0) and At(NB,a4,s0) and Robot(NB) and Robot(W) and Hungry(s0) and InBed(s0) Clear(a1, s0) and Clear(a2, s0) and Clear(a5, s0) and Clear(a6, s0).
+
+
+1.5)
+
+Action(Move(o,x,y),
+   Pre condition: (At(o,x,s) and Clear(y, s) and Robot(o) and Adjacent(x,y)) => Poss(Move(o,x,y),s),
+   Effect: Poss(Move(o,x,y),s) => At(a,x2,Result(Move(o,x,y),s)))
+
+
+1.6)
+
+Action(Grab(),
+	Pre condition: (At(NB,a1,s) and (not-CarryPlate(o,f,s)))=> Poss(Grab(),s), 
+	Effect:  Poss(Grab(),s) => CarryPlate(Result(Grab(),s)))
+
+
+1.7)
+
+Action(Dispose(),
+	Pre condition: (At(NB,a4,s) and CarryPlate(s)) => Poss(Dispose(),s),
+	Effect: Poss(Dispose(),s) => not-CarryPlate(Result(Dispose(),s)))
+
+
+1.8)
+
+Action(Feed(),
+	Pre condition: (At(nB,a3,s) and CarryPlate(s) and hungry(s) and InBed(s)) => Poss(Feed(),s),
+	Effect: Poss(Feed(),s) => not-hungry(Result(Feed(),s)))
+
+
+1.9)
+
+The problem is known as the "Frame" problem. Our Effect Axiom says what says what changes, but does not say what stays the same. We need a way to represent everything that satays the same.
+
+
+1.10)
+
+Poss(a,s) => (CarryPlate(Result(a,s)) <=> (a = Grab()) or (Carry(s) and (a /= Dispose())))
+Poss(a,s) => (At(o,x,Result(a,s)) <= (a = Move(o,y,x)) or (At(o,x,s) and (a /= Move(o,x,z))))
+Poss(a,s) => (Clear(x,Result(a,s)) <=> (a = Move(o,x,y)) or (Clear(x,s) and a/= Move(b,z,x))))
+Poss(a,s) => (hungry(Result(a,s)) <=> (hungry(s) and a /= Feed()))
+
+
+1.11)
+
+//sucsseor axiom for At
+
+ [Poss(a,s) => At(o,x,Result(a,s)) <= (a = Move(o,y,x)) or (At(o,x,s) and (a /= Move(o,x,z)))]
+
+ [not(Poss(a,s)) OR (At(o,x,Result(a,s)) OR not(a = Move(o,y,x) OR (At(o,x,s) AND not(a = Move(o,x,z)))))]
+
+ [not(Poss(a,s)) OR At(o,x,Result(a,s)) OR [not(a = Move(o,y,x)) AND (not(At(o,x,s)) OR (a = Move(o,x,z)))]]
+
+ [  [not(Poss(a,s)) OR At(o,x,Result(a,s)) OR not(a = Move(o,y,x))]   AND   [not(Poss(a,s)) OR At(o,x,Result(a,s)) OR not(At(o,x,s)) OR (a = Move(o,x,z))]  ]
+
+
+--------------------
+//possiblity of moving
+
+(At(o,x,s) and Clear(y, s) and Robot(o) and Adjacent(x,y)) => Poss(Move(o,x,y),s)
+
+[not(At(o,x,s)) OR not(Clear(y ,s)) OR not(Robot(o)) OR not(Adjacent(x,y)) OR Poss(Move(o,x,y),s)]   3
+
+-------------------
+//sucessor axiom for being Clear
+
+[not(Poss(a,s) OR (Clear(x,Result(a,s)) OR not(a = Move(o,y,x) OR (Clear(x,s) and not(a= Move(b,z,x))))]
+
+[not(Poss(a,s)) OR Clear(x,Result(a,s)) OR [not(a = Move(o,y,x)) AND (notClear(x,s) OR a = Move(b,z,x))]]
+
+[  [not(Poss(a,s)) OR Clear(x,Result(a,s)) OR not(a = Move(o,y,x))  ]  AND   [  not(Poss(a,s)) OR Clear(x,Result(a,s)) not(Clear(x,s)) OR (a = Move(b,z,x))]  ] 
+
+---------------
+All Clauses::
+
+[not(Poss(a,s)) OR At(o,x,Result(a,s)) OR not(a = Move(o,y,x))]  1
+
+[not(Poss(a,s)) OR At(o,x,Result(a,s)) OR not(At(o,x,s)) OR (a = Move(o,x,z))] 2
+
+[not(Poss(a,s)) OR Clear(x,Result(a,s)) OR not(a = Move(o,y,x))  ]  3
+
+[not(Poss(a,s)) OR Clear(x,Result(a,s)) OR not(Clear(x,s)) OR (a = Move(b,z,x))] 4
+
+[not(At(o,x,s)) OR not(Clear(y ,s)) OR not(Robot(o)) OR not(Adjacent(x,y)) OR Poss(Move(o,x,y),s)]   5
+
+//Goal negation
+[not(At(W, a3, s')) OR not(At(NB, a2, s'))]  6
+
+
+----------------
+
+6 && 2 ::
+
+[not(At(NB, a2, Result(a, s))) OR (a = Move(W,a3,z)) OR not(Poss(a,s)) OR not(At(W,a3,s))] 
+
+&& 5 ::  //canceling the poss(a,s)
+
+[not(At(NB, a2, Result(a, s))) OR (a = Move(W,a3,z)) OR not(At(W,a3,s)) OR not(At(o,x,s)) OR not(Clear(y ,s)) OR not(Robot(o)) OR not(Adjacent(x,y))] 
+
+&& [Robot(W), adjacent(a2,a3)] ::
+
+[not(At(NB, a2, Result(a, s))) OR (a = Move(W,a3,z)) OR not(At(W,a3,s)) OR not(At(W,a2,s)) OR not(Clear(a3 ,s))]
+
+&& 3 ::  //canceling the clear(a3,s)
+
+[not(At(NB, a2, Result(a, s))) OR (a = Move(W,a3,z)) OR not(At(W,a3,s)) OR not(At(W,a2,s)) OR not(a = Move(o,y,a3))  OR not(Clear(a3,Result(a, s))) OR not(Poss(a,Result(a,s)))]
+
+keep following this pattern until you end up with something empty! :)
+
+1.12)
+
+
+1.13)
+
+
+--------------------
+Answers to parts 2 and 3 should be included in the appropriate domain-*.pl and instance-*.pl files.
